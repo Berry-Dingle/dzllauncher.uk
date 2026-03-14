@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DZLL — DayZ Linux Launcher</title>
+  <meta name="description" content="DZLL is a clean, Linux-first DayZ launcher with fast server browsing, smoother mod handling, and open-source development." />
+  <style>
+    :root {
+      --bg: #0a0d0f;
+      --bg-soft: #101518;
+      --panel: rgba(255,255,255,0.04);
+      --panel-strong: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.09);
+      --text: #f5f7f8;
+      --muted: rgba(245,247,248,0.68);
+      --soft: rgba(245,247,248,0.46);
+      --accent: #6ff2c9;
+      --accent-2: #8ac7ff;
+      --shadow: 0 30px 80px rgba(0,0,0,0.35);
+      --radius: 24px;
+      --radius-sm: 18px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(111,242,201,0.16), transparent 28%),
+        radial-gradient(circle at 82% 14%, rgba(138,199,255,0.13), transparent 24%),
+        linear-gradient(180deg, #0a0d0f 0%, #0d1114 100%);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .container {
+      width: min(calc(100% - 32px), var(--max));
+      margin: 0 auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(10,13,15,0.82);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .site-header-inner {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.24);
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      color: var(--text);
+    }
+
+    .brand-text strong {
+      display: block;
+      font-size: 0.88rem;
+      letter-spacing: 0.18em;
+    }
+
+    .brand-text span {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--soft);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .nav a:hover,
+    .footer-links a:hover { color: var(--text); }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 16px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f5f7f8 0%, #dffdf3 100%);
+      color: #071013;
+      box-shadow: 0 12px 30px rgba(255,255,255,0.14);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.04);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .btn-subtle {
+      background: rgba(111,242,201,0.08);
+      border-color: rgba(111,242,201,0.18);
+      color: var(--accent);
+    }
+
+    .hero {
+      padding: 72px 0 32px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 18px rgba(111,242,201,0.8);
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 {
+      font-size: clamp(2.8rem, 7vw, 5.4rem);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+      max-width: 12ch;
+    }
+
+    .hero-copy p {
+      margin-top: 24px;
+      font-size: 1.12rem;
+      line-height: 1.8;
+      color: var(--muted);
+      max-width: 60ch;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 22px;
+      color: var(--soft);
+      font-size: 0.95rem;
+    }
+
+    .hero-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .hero-meta span:not(:last-child)::after {
+      content: "";
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+    }
+
+    .hero-visual-wrap {
+      position: relative;
+    }
+
+    .hero-visual-wrap::before {
+      content: "";
+      position: absolute;
+      inset: -20px;
+      background: radial-gradient(circle at center, rgba(111,242,201,0.14), transparent 58%);
+      filter: blur(18px);
+      z-index: 0;
+    }
+
+    .hero-visual {
+      position: relative;
+      z-index: 1;
+      padding: 14px;
+      border-radius: 32px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .window {
+      background: linear-gradient(180deg, rgba(14,18,21,0.98), rgba(10,13,15,0.98));
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 24px;
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .window-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 16px;
+    }
+
+    .dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.16);
+    }
+
+    .window-badge {
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: var(--soft);
+      font-size: 0.76rem;
+    }
+
+    .window-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 16px;
+    }
+
+    .panel {
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      padding: 16px;
+    }
+
+    .panel-title {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--soft);
+      margin-bottom: 14px;
+    }
+
+    .filter-item,
+    .server-row,
+    .mini-chip {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .filter-item {
+      padding: 10px 12px;
+      color: var(--muted);
+      border-radius: 14px;
+      font-size: 0.92rem;
+    }
+
+    .filters-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .servers-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .server-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border-radius: 18px;
+    }
+
+    .server-row.active {
+      border-color: rgba(111,242,201,0.26);
+      background: rgba(111,242,201,0.08);
+    }
+
+    .server-name {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .server-meta {
+      font-size: 0.82rem;
+      color: var(--soft);
+    }
+
+    .pill {
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+
+    section.block {
+      padding: 92px 0 0;
+    }
+
+    .section-head {
+      max-width: 760px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .section-head h2 {
+      font-size: clamp(2rem, 5vw, 3.7rem);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+    }
+
+    .section-head p {
+      margin-top: 18px;
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 44px;
+    }
+
+    .feature-card,
+    .preview-card,
+    .step-card,
+    .cta-card {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--panel);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.16);
+    }
+
+    .feature-card {
+      padding: 24px;
+    }
+
+    .feature-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      border: 1px solid rgba(111,242,201,0.18);
+      background: rgba(111,242,201,0.08);
+      color: var(--accent);
+      font-size: 1rem;
+      margin-bottom: 18px;
+    }
+
+    .feature-card h3,
+    .preview-copy h3,
+    .step-card h3,
+    .cta-card h3 { font-size: 1.18rem; }
+
+    .feature-card p,
+    .preview-copy p,
+    .step-card p,
+    .cta-card p {
+      margin-top: 10px;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 22px;
+      align-items: center;
+      margin-top: 44px;
+    }
+
+    .preview-copy-stack {
+      display: grid;
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .preview-card {
+      padding: 18px 20px;
+    }
+
+    .preview-card strong {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .preview-visuals {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .mock-card {
+      min-height: 210px;
+      padding: 18px;
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
+    }
+
+    .mock-card.large { grid-column: 1 / -1; min-height: 260px; }
+
+    .mock-label {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .mini-chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--soft);
+      font-size: 0.82rem;
+    }
+
+    .mock-box {
+      margin-top: 14px;
+      min-height: 130px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(8,11,13,0.7);
+      padding: 16px;
+      color: var(--soft);
+      line-height: 1.7;
+      font-size: 0.94rem;
+    }
+
+    .warning-box {
+      background: rgba(255,190,92,0.1);
+      border-color: rgba(255,190,92,0.22);
+      color: rgba(255,243,220,0.9);
+    }
+
+    .steps-wrap {
+      margin-top: 44px;
+      padding: 24px;
+      border-radius: 32px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .step-card {
+      padding: 24px;
+      background: rgba(10,13,15,0.68);
+    }
+
+    .step-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      margin-bottom: 16px;
+      color: var(--accent);
+      border: 1px solid rgba(111,242,201,0.18);
+      background: rgba(111,242,201,0.08);
+    }
+
+    .cta-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: end;
+    }
+
+    .cta-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .support-card {
+      padding: 34px;
+      background:
+        linear-gradient(135deg, rgba(111,242,201,0.09), rgba(255,255,255,0.04) 52%, rgba(138,199,255,0.08));
+      box-shadow: 0 20px 90px rgba(111,242,201,0.08);
+    }
+
+    .site-footer {
+      padding: 28px 0 42px;
+      margin-top: 92px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .footer-brand strong {
+      display: block;
+      font-size: 0.9rem;
+      letter-spacing: 0.16em;
+    }
+
+    .footer-brand span,
+    .copyright {
+      color: var(--soft);
+      font-size: 0.92rem;
+      display: block;
+      margin-top: 6px;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    @media (max-width: 1080px) {
+      .hero-grid,
+      .preview-grid,
+      .cta-grid,
+      .footer-inner {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+
+      .window-layout,
+      .features-grid,
+      .steps-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .nav { display: none; }
+      .header-actions .btn-secondary { display: none; }
+      .footer-links { justify-content: flex-start; }
+    }
+
+    @media (max-width: 720px) {
+      .hero { padding-top: 44px; }
+
+      .window-layout,
+      .features-grid,
+      .preview-visuals,
+      .steps-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .server-row {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .site-header-inner,
+      .footer-inner {
+        display: block;
+      }
+
+      .header-actions {
+        margin-top: 16px;
+      }
+
+      .support-card,
+      .steps-wrap {
+        padding: 24px;
+      }
+
+      .site-footer { margin-top: 70px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a class="brand" href="#top">
+        <div class="brand-mark">DZ</div>
+        <div class="brand-text">
+          <strong>DZLL</strong>
+          <span>DayZ Linux Launcher</span>
+        </div>
+      </a>
+
+      <nav class="nav">
+        <a href="#features">Features</a>
+        <a href="#preview">Preview</a>
+        <a href="#download">Download</a>
+        <a href="#support">Support</a>
+      </nav>
+
+      <div class="header-actions">
+        <a class="btn btn-secondary" href="https://github.com/Berry-Dingle/DayZ-Linux-Launcher" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn btn-primary" href="https://github.com/Berry-Dingle/DayZ-Linux-Launcher/releases" target="_blank" rel="noopener">Download</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow">Open source • Linux-first • Static and clean</div>
+          <h1>The DayZ launcher Linux players deserve</h1>
+          <p>
+            Browse servers, handle mods, and launch DayZ on Linux with a cleaner, faster workflow.
+            Built for Proton, made for players, and fully open source.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="https://github.com/Berry-Dingle/DayZ-Linux-Launcher/releases" target="_blank" rel="noopener">Download DZLL</a>
+            <a class="btn btn-secondary" href="https://github.com/Berry-Dingle/DayZ-Linux-Launcher" target="_blank" rel="noopener">View on GitHub</a>
+            <a class="btn btn-subtle" href="https://buymeacoffee.com/berry.dingle" target="_blank" rel="noopener">Buy Me a Coffee</a>
+          </div>
+
+          <div class="hero-meta">
+            <span>Free and open source</span>
+            <span>Hosted on GitHub</span>
+            <span>dzllauncher.uk</span>
+          </div>
+        </div>
+
+        <div class="hero-visual-wrap">
+          <div class="hero-visual">
+            <div class="window">
+              <div class="window-top">
+                <div class="dots"><span></span><span></span><span></span></div>
+                <div class="window-badge">DZLL Preview</div>
+              </div>
+
+              <div class="window-layout">
+                <aside class="panel">
+                  <div class="panel-title">Filters</div>
+                  <div class="filters-list">
+                    <div class="filter-item">Search servers</div>
+                    <div class="filter-item">Favourites only</div>
+                    <div class="filter-item">Low ping</div>
+                    <div class="filter-item">No password</div>
+                    <div class="filter-item">Online only</div>
+                  </div>
+                </aside>
+
+                <section class="panel">
+                  <div class="servers-list">
+                    <article class="server-row active">
+                      <div>
+                        <div class="server-name">Zero Day Namalsk</div>
+                        <div class="server-meta">Modded • Linux launch ready</div>
+                      </div>
+                      <div class="pill">127/127</div>
+                      <div class="pill">42 ms</div>
+                    </article>
+
+                    <article class="server-row">
+                      <div>
+                        <div class="server-name">Chernarus Survival EU</div>
+                        <div class="server-meta">Vanilla • High population</div>
+                      </div>
+                      <div class="pill">84/100</div>
+                      <div class="pill">58 ms</div>
+                    </article>
+
+                    <article class="server-row">
+                      <div>
+                        <div class="server-name">Deer Isle Hardcore</div>
+                        <div class="server-meta">1PP • Modded</div>
+                      </div>
+                      <div class="pill">63/80</div>
+                      <div class="pill">71 ms</div>
+                    </article>
+
+                    <article class="server-row">
+                      <div>
+                        <div class="server-name">Livonia Modded PvE</div>
+                        <div class="server-meta">Safe zone • Community server</div>
+                      </div>
+                      <div class="pill">49/60</div>
+                      <div class="pill">89 ms</div>
+                    </article>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="block">
+      <div class="container">
+        <div class="section-head">
+          <div class="eyebrow">Features</div>
+          <h2>Everything you need to get into DayZ faster</h2>
+          <p>
+            DZLL is designed to remove friction from the Linux DayZ experience without turning the launcher into a bloated mess.
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="feature-icon">01</div>
+            <h3>Fast server browsing</h3>
+            <p>Find populated servers quickly with a cleaner browser, useful filters, and favourites that actually feel nice to use.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">02</div>
+            <h3>SteamCMD integration</h3>
+            <p>Built around Linux workflows, with a smoother path for getting server requirements in place.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">03</div>
+            <h3>Automatic mod handling</h3>
+            <p>Streamline the messy parts of joining modded servers so getting in-game takes less effort.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">04</div>
+            <h3>Blocklist protection</h3>
+            <p>Optional filtering and clear warnings help avoid suspicious servers without getting in your way.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">05</div>
+            <h3>Linux-first design</h3>
+            <p>Built specifically for Linux players instead of feeling like a Windows launcher awkwardly dragged over.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">06</div>
+            <h3>Free and open source</h3>
+            <p>Transparent, community-friendly, and hosted on GitHub with optional support through donations.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="preview" class="block">
+      <div class="container">
+        <div class="preview-grid">
+          <div class="preview-copy">
+            <div class="eyebrow">Preview</div>
+            <h2>A cleaner launcher experience</h2>
+            <p>
+              DZLL focuses on the parts that matter: browsing servers, handling mods, and getting you in-game with less hassle.
+            </p>
+
+            <div class="preview-copy-stack">
+              <div class="preview-card">
+                <strong>Server browser</strong>
+                <p>Search, filter, favourite, and sort without the usual friction.</p>
+              </div>
+              <div class="preview-card">
+                <strong>Mod workflow</strong>
+                <p>A cleaner path for preparing required content before launch.</p>
+              </div>
+              <div class="preview-card">
+                <strong>Safer joining</strong>
+                <p>Warnings and optional filtering for suspicious servers.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="preview-visuals">
+            <div class="mock-card large">
+              <div class="mock-label">Server Browser</div>
+              <div class="chips">
+                <div class="mini-chip">Favourites</div>
+                <div class="mini-chip">1PP only</div>
+                <div class="mini-chip">No password</div>
+                <div class="mini-chip">Online only</div>
+              </div>
+              <div class="mock-box">Fast filtering, favourites, and a cleaner launch flow with less clutter and less messing around.</div>
+            </div>
+
+            <div class="mock-card">
+              <div class="mock-label">Mod Handling</div>
+              <div class="mock-box">SteamCMD auth, prep flow, and smoother server requirements handling.</div>
+            </div>
+
+            <div class="mock-card">
+              <div class="mock-label">Safety Warnings</div>
+              <div class="mock-box warning-box">Optional blocklist filtering and warning overlays before joining known risky servers.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="container">
+        <div class="steps-wrap">
+          <div class="section-head" style="text-align:left; max-width:none; margin:0 0 28px 0;">
+            <div class="eyebrow">How it works</div>
+            <h2>From server browser to in-game in a few steps</h2>
+          </div>
+
+          <div class="steps-grid">
+            <article class="step-card">
+              <div class="step-number">1</div>
+              <h3>Pick a server</h3>
+              <p>Browse, search, filter, and favourite servers in a Linux-friendly interface.</p>
+            </article>
+
+            <article class="step-card">
+              <div class="step-number">2</div>
+              <h3>Prepare required mods</h3>
+              <p>DZLL streamlines the mod workflow through SteamCMD and launcher integration.</p>
+            </article>
+
+            <article class="step-card">
+              <div class="step-number">3</div>
+              <h3>Launch and connect</h3>
+              <p>Start DayZ with the correct setup and get into the server faster.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="download" class="block">
+      <div class="container cta-grid">
+        <div>
+          <div class="eyebrow">Download</div>
+          <h2>Download DZLL</h2>
+          <p style="margin-top:18px; color:var(--muted); font-size:1.05rem; line-height:1.8; max-width:60ch;">
+            Get the latest release, browse the source code, or follow development on GitHub.
+          </p>
+        </div>
+
+        <div class="cta-actions">
+          <a class="btn btn-primary" href="https://github.com/Berry-Dingle/DayZ-Linux-Launcher/releases" target="_blank" rel="noopener">Latest Release</a>
+          <a class="btn btn-secondary" href="https://github.com/Berry-Dingle/DayZ-Linux-Launcher" target="_blank" rel="noopener">GitHub Repository</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="support" class="block">
+      <div class="container">
+        <div class="cta-card support-card">
+          <h3 style="font-size: clamp(2rem, 4vw, 3.6rem); line-height:1.04; letter-spacing:-0.04em;">Support development</h3>
+          <p style="max-width:70ch; margin-top:18px;">
+            DZLL is free and open source. If you find it useful and want to help keep development moving,
+            you can support the project with a donation or star the repository on GitHub.
+          </p>
+          <div class="hero-actions" style="margin-top:26px;">
+            <a class="btn btn-primary" href="https://buymeacoffee.com/berry.dingle" target="_blank" rel="noopener">Buy Me a Coffee</a>
+            <a class="btn btn-secondary" href="https://github.com/Berry-Dingle/DayZ-Linux-Launcher" target="_blank" rel="noopener">Star on GitHub</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <strong>DZLL</strong>
+        <span>DayZ Linux Launcher • Built for Linux DayZ players</span>
+        <span class="copyright">© 2026 DZLL. Free and open source.</span>
+      </div>
+
+      <div class="footer-links">
+        <a href="https://dzllauncher.uk" target="_blank" rel="noopener">dzllauncher.uk</a>
+        <a href="https://github.com/Berry-Dingle/dzllauncher.uk" target="_blank" rel="noopener">Site Repo</a>
+        <a href="https://github.com/Berry-Dingle/DayZ-Linux-Launcher" target="_blank" rel="noopener">DZLL Repo</a>
+        <a href="https://buymeacoffee.com/berry.dingle" target="_blank" rel="noopener">Buy Me a Coffee</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
