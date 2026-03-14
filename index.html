@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DZLL — DayZ Linux Launcher</title>
+  <meta name="description" content="DZLL is a fast, no-nonsense DayZ launcher for Linux. Browse servers, manage mods, and join quickly." />
+  <meta property="og:title" content="DZLL — DayZ Linux Launcher" />
+  <meta property="og:description" content="A fast, no-nonsense DayZ launcher for Linux." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://dzllauncher.uk/" />
+  <meta property="og:image" content="https://dzllauncher.uk/assets/dzll-og.svg" />
+  <meta name="theme-color" content="#0b0f14" />
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container nav">
+      <a class="brand" href="/index.html" aria-label="Home">
+        <div class="brand-badge"><span>DZ</span></div>
+        <div>DayZ Linux Launcher</div>
+      </a>
+      <nav class="navlinks" aria-label="Site">
+        <a class="pill active" href="/index.html">Home</a>
+        <a class="pill" href="/features.html">Features</a>
+        <a class="pill" href="/downloads.html">Downloads</a>
+        <a class="pill" href="/faq.html">FAQ</a>
+        <a class="pill" href="/support.html">Support</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="panel">
+          <div class="panel-inner">
+            <div class="kicker">
+              <span class="tag green">FOSS</span>
+              <span class="tag">Linux-first</span>
+              <span class="tag">Fast joins</span>
+              <span class="tag">Mod handling</span>
+            </div>
+            <h1>DZLL</h1>
+            <p class="sub">A fast, no-nonsense DayZ launcher for Linux. Browse servers, manage mods, and join quickly — without the pain.</p>
+
+            <div class="cta">
+              <a class="btn primary" href="https://github.com/Berry-Dingle/DayZ-Linux-Launcher/releases" target="_blank" rel="noreferrer">Get Releases</a>
+              <a class="btn" href="https://discord.gg/vhd6SbvAqS" target="_blank" rel="noreferrer">Join Discord</a>
+              <a class="btn ghost" href="https://github.com/Berry-Dingle/DayZ-Linux-Launcher" target="_blank" rel="noreferrer">View Source</a>
+            </div>
+
+            <p class="mini">
+              Repo: <span class="code">Berry-Dingle/DayZ-Linux-Launcher</span>
+              <button class="btn ghost" style="padding:6px 10px;margin-left:8px" data-copy="https://github.com/Berry-Dingle/DayZ-Linux-Launcher">Copy</button>
+            </p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-inner">
+            <h2 style="margin:0 0 10px;font-size:18px">Quick links</h2>
+            <div class="kv">
+              <div class="row">
+                <span>GitHub</span>
+                <strong>Berry-Dingle/DayZ-Linux-Launcher</strong>
+              </div>
+              <div class="row">
+                <span>Discord</span>
+                <strong>vhd6SbvAqS</strong>
+              </div>
+              <div class="row">
+                <span>Donate</span>
+                <strong>buymeacoffee.com/berry.dingle</strong>
+              </div>
+            </div>
+
+            <hr class="sep" />
+
+            <div class="notice">
+              <strong>Unofficial community launcher.</strong><br/>
+              Not affiliated with Bohemia Interactive. DayZ and related trademarks belong to their respective owners.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container grid3">
+        <div class="card">
+          <h3>Server browsing that doesn’t fight you</h3>
+          <p>Search, filters, favourites, sane sorting — and fast refresh.</p>
+        </div>
+        <div class="card">
+          <h3>Mod handling that actually works</h3>
+          <p>SteamCMD install / update / verify when you want it — designed around the DayZ Launcher workflow.</p>
+        </div>
+        <div class="card">
+          <h3>Discord Rich Presence</h3>
+          <p>Show “in menus / in game / on server” with optional privacy mode.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2>What is DZLL?</h2>
+        <p class="lead">
+          DZLL is a Linux-first DayZ launcher designed for quick joins and practical mod handling under Proton.
+          No drama, no bloat — just the stuff you actually need.
+        </p>
+
+        <div class="cta">
+          <a class="btn primary" href="/features.html">See features</a>
+          <a class="btn warn" href="/downloads.html">Download</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between;align-items:center">
+      <div>© <span id="y"></span> DZLL — DayZ Linux Launcher</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <a href="/privacy.html">Privacy</a>
+        <a href="https://github.com/Berry-Dingle/DayZ-Linux-Launcher" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="https://discord.gg/vhd6SbvAqS" target="_blank" rel="noreferrer">Discord</a>
+        <a href="https://buymeacoffee.com/berry.dingle" target="_blank" rel="noreferrer">Donate</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+  <script src="/assets/app.js"></script>
+</body>
+</html>
